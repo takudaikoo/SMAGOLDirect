@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var thanksPageUrl = 'thanks.html';
     var confirmBtn = document.getElementById('sg-confirm-btn');
+    var clearBtn = document.getElementById('sg-clear-btn');
     var canvas = document.getElementById('sg-full-canvas');
 
     // --- 署名パッド設定 ---
@@ -28,14 +29,20 @@ document.addEventListener('DOMContentLoaded', function () {
         canvas.height = canvas.offsetHeight * ratio;
         canvas.getContext("2d").scale(ratio, ratio);
 
-        // リサイズするとクリアされるので、必要ならデータを保存して復元する処理が必要だが
-        // 今回は簡易的にクリアとする（ユーザーが書き直す想定）
-        // signaturePad.clear(); 
-        // ※ clear()を呼ばなくてもリサイズで消えるが、SignaturePadの内部状態リセットのため呼ぶ
-        // ただし、描画中に回転などは頻繁にない前提とする
+        // リサイズ時のクリア対策（今回はリセットさせる仕様）
+        signaturePad.clear();
+        confirmBtn.disabled = true; // クリアされたらボタンも無効化
     }
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
+
+    // クリアボタン
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function () {
+            signaturePad.clear();
+            confirmBtn.disabled = true; // ボタン無効化
+        });
+    }
 
     // 確定ボタンクリック時の処理
     confirmBtn.addEventListener('click', async function () {
@@ -52,6 +59,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // 送信処理開始
         confirmBtn.textContent = '送信中...';
         confirmBtn.disabled = true;
+        if (clearBtn) clearBtn.disabled = true; // 送信中はクリアも無効
 
         try {
             // 1. 署名を画像データ(Blob)に変換
@@ -93,6 +101,7 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('Error:', error);
             alert('送信に失敗しました。\nエラー: ' + error.message);
             confirmBtn.disabled = false;
+            if (clearBtn) clearBtn.disabled = false;
             confirmBtn.textContent = '確定する';
         }
     });
