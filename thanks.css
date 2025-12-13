@@ -12,7 +12,8 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh; /* 画面の高さ確保 */
+  min-height: 100vh;
+  /* 画面の高さ確保 */
   font-family: "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", serif;
   color: #333;
   padding: 20px;
@@ -36,10 +37,12 @@ body {
 .sg-icon-box {
   margin-bottom: 30px;
 }
+
 .sg-check-icon {
   width: 70px;
   height: 70px;
-  color: #c5a059; /* 落ち着いたゴールド */
+  color: #c5a059;
+  /* 落ち着いたゴールド */
   stroke-width: 1.2;
 }
 
@@ -61,6 +64,28 @@ body {
   line-height: 2;
   margin-bottom: 1.5em;
   font-family: "Helvetica Neue", Arial, sans-serif;
+}
+
+/* --- 購入ボタン --- */
+.sg-purchase-btn {
+  display: inline-block;
+  background-color: #c5a059;
+  color: #fff;
+  text-decoration: none;
+  padding: 15px 40px;
+  font-size: 16px;
+  border-radius: 4px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  transition: opacity 0.3s;
+  margin-top: 10px;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  box-shadow: 0 4px 6px rgba(197, 160, 89, 0.3);
+}
+
+.sg-purchase-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
 }
 
 /* --- 閉じる案内（注釈） --- */
