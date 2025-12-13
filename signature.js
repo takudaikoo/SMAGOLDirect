@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // --- 署名パッド設定 ---
     // --- 署名パッド設定 ---
     var signaturePad = new SignaturePad(canvas, {
-        backgroundColor: 'rgb(255, 255, 255)' // 背景白
+        // backgroundColor: 'rgb(255, 255, 255)' // 背景を透過させるためコメントアウト
     });
 
     // v4系は onEnd オプションではなくイベントリスナーを使用
