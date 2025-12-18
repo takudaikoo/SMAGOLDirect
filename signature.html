@@ -117,7 +117,7 @@
         }
     </style>
     <!-- Supabase & Signature Pad -->
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
 </head>
 
@@ -125,7 +125,9 @@
 
     <div class="sg-signature-header">
         <button id="sg-clear-btn" class="sg-clear-btn"
-            style="margin-right: auto; background: #999; color: #fff; border:none; padding: 10px 20px; font-size: 14px; border-radius: 4px; cursor: pointer;">クリア</button>
+            style="margin-right: 10px; background: #999; color: #fff; border:none; padding: 10px 20px; font-size: 14px; border-radius: 4px; cursor: pointer;">クリア</button>
+        <input type="text" id="sg-name-input" placeholder="お名前を入力"
+            style="margin-right: auto; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px;">
         <button id="sg-confirm-btn" class="sg-confirm-btn" disabled>確定する</button>
     </div>
 

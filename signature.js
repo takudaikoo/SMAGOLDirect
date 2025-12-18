@@ -1,10 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
 
-    // ▼▼▼ Supabase 設定 ▼▼▼
-    var SUPABASE_URL = 'https://kmgetttzcynuruvwacld.supabase.co';
-    var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttZ2V0dHR6Y3ludXJ1dndhY2xkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDI4MDUsImV4cCI6MjA4MTE3ODgwNX0.6UC6LF7ghREyea0j2lk2UD0jZTaVqL3kkFWJwhEDrbc';
-    var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+    // Supabase 設定削除済み
 
     var thanksPageUrl = 'thanks.html';
     var confirmBtn = document.getElementById('sg-confirm-btn');
@@ -64,37 +60,35 @@ document.addEventListener('DOMContentLoaded', function () {
         if (clearBtn) clearBtn.disabled = true; // 送信中はクリアも無効
 
         try {
-            // 1. 署名を画像データ(Blob)に変換
+            // 1. 署名を画像データ(Base64)として取得
             var dataUrl = signaturePad.toDataURL('image/png');
-            var blob = await (await fetch(dataUrl)).blob();
             var fileName = 'sign_' + Date.now() + '.png';
 
-            // 2. Supabase Storageへアップロード
-            var { data: uploadData, error: uploadError } = await supabase
-                .storage
-                .from('signatures')
-                .upload(fileName, blob, {
-                    contentType: 'image/png'
-                });
+            // 2. Google Driveへアップロード (GAS経由)
+            var GAS_URL = 'https://script.google.com/macros/s/AKfycbxFFn-ZE7FT-d3lvwDdEmYI7k0rxRPryXC8QjHXyafx-WOJRrO27WPxDRkdeYWQckE/exec';
 
-            if (uploadError) throw uploadError;
+            // dataUrl ("data:image/png;base64,...") そのまま送信してもGAS側でパース可能に作ってありますが、
+            // ここでは念の為そのまま送ります (GAS側で split 処理などが実装されている前提)
 
-            var signaturePath = uploadData.path;
-            // 公開URLを取得
-            var { data: publicUrlData } = supabase.storage.from('signatures').getPublicUrl(signaturePath);
-            var publicUrl = publicUrlData.publicUrl;
+            var response = await fetch(GAS_URL, {
+                method: 'POST',
+                mode: 'cors', // 必須: GAS Web App は CORS ヘッダーを返す必要がある
+                headers: {
+                    'Content-Type': 'text/plain;charset=utf-8', // GASへのPOSTは text/plain が無難 (JSONだとpreflightで弾かれることがあるため)
+                },
+                body: JSON.stringify({
+                    image: dataUrl,
+                    filename: fileName
+                })
+            });
 
-            // 3. データベースへ保存 (agreementsテーブル)
-            var { error: dbError } = await supabase
-                .from('agreements')
-                .insert([
-                    {
-                        signature_url: publicUrl,
-                        user_agent: navigator.userAgent
-                    }
-                ]);
+            var result = await response.json();
 
-            if (dbError) throw dbError;
+            if (result.status !== 'success') {
+                throw new Error('Google Drive upload failed: ' + (result.message || 'Unknown error'));
+            }
+
+            // 3. データベース保存処理は削除 (Google Drive保存のみ)
 
             // 4. サンクスページへ遷移
             window.location.href = thanksPageUrl;
